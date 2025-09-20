@@ -1,0 +1,8 @@
+{
+  "name": "chain-of-trust",
+  "version": "1.0.0",
+  "dependencies": [
+    "detours",
+    "gtest"
+  ]
+}

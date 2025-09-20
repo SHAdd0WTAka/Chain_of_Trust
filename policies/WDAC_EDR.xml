@@ -1,0 +1,6 @@
+<SiPolicy xmlns="urn:schemas-microsoft-com:sipolicy">
+  <PolicyName>Chain_of_Trust_EDR</PolicyName>
+  <Rules>
+    <!-- Add WDAC rules here -->
+  </Rules>
+</SiPolicy>

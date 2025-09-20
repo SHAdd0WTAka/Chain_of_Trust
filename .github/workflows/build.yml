@@ -1,0 +1,15 @@
+name: Build & Test
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - run: vcpkg install detours:x64-windows gtest:x64-windows
+      - run: cmake --preset=ci-windows
+      - run: cmake --build --preset=ci-windows --config Release
+      - run: ctest --preset=ci-windows -C Release --output-on-failure
