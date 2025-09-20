@@ -9,7 +9,8 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
-      - run: vcpkg install detours:x64-windows gtest:x64-windows
+      - run: vcpkg install
       - run: cmake --preset=ci-windows
       - run: cmake --build --preset=ci-windows --config Release
       - run: ctest --preset=ci-windows -C Release --output-on-failure
+
