@@ -1,16 +1,26 @@
 name: Build & Test
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 jobs:
   build:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
-      - run: vcpkg install
-      - run: cmake --preset=ci-windows
-      - run: cmake --build --preset=ci-windows --config Release
-      - run: ctest --preset=ci-windows -C Release --output-on-failure
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Install vcpkg dependencies
+        run: vcpkg install
+
+      - name: Configure with CMake
+        run: cmake -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -G "Visual Studio 17 2022" -A x64 -S . -B out/build/ci-windows
+
+      - name: Build
+        run: cmake --build out/build/ci-windows --config Release
+
+      - name: Test
+        run: ctest --test-dir out/build/ci-windows -C Release --output-on-failure
