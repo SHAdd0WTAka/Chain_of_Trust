@@ -1,0 +1,9 @@
+out/
+*.obj
+*.exe
+*.log
+*.pdb
+*.ilk
+*.user
+.vscode/
+*.zip
