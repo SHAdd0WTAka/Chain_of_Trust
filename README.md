@@ -1,27 +1,36 @@
-# Chain_of_Trust
-Open-source, kernel-backed, TPM-sealed EDR.
-# Chain_of_Trust
+# Chain_of_Trust 🔐
 
-TPM-sealed, kernel-level Endpoint Detection & Response (EDR) for Windows.  
-Includes WHQL-ready driver, WDAC policy enforcement, and full CI/CD automation.
+## 🧠 Projektbeschreibung
+Dieses Projekt kombiniert Kernel-Mode-Hooks, TPM-Verschlüsselung und ETW-Sampling zu einem modularen EDR-System für Windows.
 
----
+## ✨ Features aus deiner lokalen Version
+- MiniDump-Scrubbing mit Heuristik
+- AppContainer-Isolation via Job Objects
+- WDAC-Policy mit expliziter Binary-Freigabe
 
-## 🛠 Features
+## 📦 Remote-Ergänzungen (fe279d8)
+- PowerShell-Deployment mit Signaturprüfung
+- CMake-Härtung mit /guard:cf, /Qspectre, /CETCOMPAT
+- TPM-gestützte AES-GCM-Verschlüsselung
 
-- 🧠 **User-mode agent** with protected process launch
-- 🛡️ **Kernel-mode driver** using OBCallbacks for handle filtering
-- 🔐 **TPM-sealed secrets** and WDAC policy enforcement
-- 🧪 **GTest-based unit tests** for crypto and IPC
-- 🚀 **GitHub Actions** for build, sign, release, and packaging
-- 📦 **vcpkg integration** with Detours and GTest
-- 📜 **EUPL-1.2 license** – free for commercial use
+## 📚 Dokumentation
+Siehe Wiki & Diskussionen für Architekturdetails und Roadmap.
 
----
+# Vertrauensnetz 🔐  
+Chain-of-Trust für Windows-Treiber mit TPM & WDAC
 
-## 🔧 Build
+![Build](https://github.com/SHAdd0WTAka/Vertrauensnetz/actions/workflows/build.yml/badge.svg)
+![License](https://img.shields.io/github/license/SHAdd0WTAka/Vertrauensnetz)
+![Release](https://img.shields.io/github/v/release/SHAdd0WTAka/Vertrauensnetz)
 
-```bash
+## Features
+
+- 🧩 Modularer CMake-Build mit vcpkg  
+- 🔐 TPM-gestützte Vertrauensprüfung  
+- 🛡️ WDAC-konforme Treibersignatur  
+- ⚙️ Automatisierter CI-Workflow mit GitHub Actions
+
+## Build & Test
 git clone https://github.com/SHAdd0WTAka/Chain_of_Trust.git
 cd Chain_of_Trust
 cmake --preset=ci-windows
@@ -309,3 +318,11 @@ EUPL-1.2 – free for commercial use, patent clause included.
 3. Commit & Push – GitHub Actions baut sofort.  
 
 WHQL- / EV-Zertifikat eintragen → fertig für Produktion.
+git clone https://github.com/SHAdd0WTAka/Vertrauensnetz.git
+cd Vertrauensnetz
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake --build build --config Release
+ctest --test-dir build -C Release
+HEAD
+(deine lokale Version)
+(Remote-Version) fe279d8 (Update README.md)
