@@ -1,7 +1,79 @@
 # Chain_of_Trust 🔐
 
+| Feature / Layer           | Kernel-gestütztes EDR-System | Cross-Platform EDR Map       | EDR-EXPLANATION Summary        |
+|---------------------------|------------------------------|-------------------------------|--------------------------------|
+| Platform Scope            | Windows (kernel-mode)        | Windows, Linux, macOS         | Windows-focused                |
+| Monitoring Mechanism      | Kernel callbacks (OB, Ps...) | ETW, eBPF, EndpointSecurity   | ETW + Registry + MiniDump      |
+| Process Protection        | Blocks ProtectedApp.exe      | Abstracted across OSes        | Self-healing + restart         |
+| Encryption                | TPM-backed AES-GCM           | TLS for agent comms           | TPM + AES-256 + ECDSA          |
+| Event Logging             | ETW with sampling             | Unified JSON schema           | Structured ETW events          |
+| Deployment Strategy       | PowerShell + WDAC            | Intune, Ansible, MDM          | Intune + HLK automation        |
+| Detection Engine          | Signature + heuristics       | Sigma/YARA-L + optional ML    | IOC + Defender ATP             |
+| Response Actions          | Block access, restore files  | Kill process, quarantine      | Restart protected process      |
+| Security Hardening        | CMake flags + signed driver  | WHQL, DKMS, Notarization      | Registry keys + WHQL           |
+| Red Team Validation       | Not mentioned                | Atomic Red Team + benchmarks  | Azure DevOps pipeline          |
+| Cloud Integration         | WDAC + TPM                   | SIEMs (Splunk, Sentinel)      | Defender ATP + Azure DevOps    |
+| Scalability               | Single-platform              | Modular agents across OSes    | 10,000+ endpoints              |
+
+
+
+ — der Coder ist **nicht nur theoretisch umsetzbar**, sondern zeigt auch ein bemerkenswert hohes Maß an Realitätsnähe. Die Konzepte in deiner Seite sind tief in den Windows-Interna verankert und basieren auf APIs und Mechanismen, die **tatsächlich existieren und produktiv eingesetzt werden können**. Hier ein kurzer Reality-Check zu den wichtigsten Komponenten:
+
+---
+
+### ✅ Was ist praktisch umsetzbar?
+
+| Komponente | Umsetzbarkeit | Hinweise |
+|------------|----------------|----------|
+| **Kernel-Mode Driver mit `OB_PREOP_CALLBACK_STATUS` & `PsSetCreateProcessNotifyRoutineEx`** | ✔️ Hoch | Wird in legitimen AV/EDR-Lösungen wie Microsoft Defender verwendet. Treibersignierung erforderlich. |
+| **TPM-gestützte AES-GCM-Verschlüsselung** | ✔️ Hoch | TPM kann über Windows APIs wie `NCrypt` angesprochen werden. AES-GCM ist in modernen Crypto-Libraries enthalten. |
+| **ETW mit Sampling** | ✔️ Hoch | ETW ist ein offizielles Windows-Subsystem. Sampling kann über eigene Filterlogik gesteuert werden. |
+| **AppContainer & Job Objects zur Isolation** | ✔️ Hoch | Wird von Microsoft Edge und anderen Apps genutzt. APIs wie `CreateAppContainerProfile` sind öffentlich dokumentiert. |
+| **MiniDump-Scrubbing** | ✔️ Mittel bis Hoch | `MiniDumpWriteDump` erlaubt benutzerdefinierte Callbacks. Scrubbing erfordert gute Heuristik. |
+| **WDAC Policy Deployment via PowerShell** | ✔️ Hoch | `CiTool.exe` und `Set-RuleOption` sind offizielle Tools. Erfordert Adminrechte und gutes Policy-Design. |
+| **CMake Hardening Flags** | ✔️ Hoch | Flags wie `/guard:cf` und `/Qspectre` sind direkt nutzbar. CET erfordert Hardware-Support. |
+
+---
+
+Fazit
+
+Das ist kein Luftschloss. Es ist ein Blueprint für ein ernstzunehmendes Sicherheitsprodukt. Natürlich steckt der Teufel im Detail — Treiberentwicklung, Signierung, Testing und Policy-Tuning sind anspruchsvoll. Aber mit dem richtigen Team und Fokus ist das absolut realisierbar.
+
+
+
 ## 🧠 Projektbeschreibung
-Dieses Projekt kombiniert Kernel-Mode-Hooks, TPM-Verschlüsselung und ETW-Sampling zu einem modularen EDR-System für Windows.
++----------------------------------------------------------------------------------+
+|                            🌐 Cross-Platform Strategy                            |
+|----------------------------------------------------------------------------------|
+| OS Coverage: Windows, Linux, macOS                                               |
+| Monitoring: ETW (Win), eBPF (Linux), EndpointSecurity (macOS)                   |
+| Event Normalization: Unified JSON schema                                         |
+| Agent Communication: gRPC + TLS                                                  |
+| Detection Engine: Sigma/YARA-L + optional ML                                     |
+| Cloud Integration: Splunk, Sentinel, Elastic                                     |
++----------------------------------------------------------------------------------+
+
++----------------------------------------------------------------------------------+
+|                        🛡️ Kernel-Mode Implementation (Windows)                   |
+|----------------------------------------------------------------------------------|
+| Driver: Signed kernel-mode driver (`edrdrv.c`)                                   |
+| Process Protection: OB callbacks block access to `ProtectedApp.exe`             |
+| Encryption: TPM-backed AES-GCM                                                   |
+| Logging: ETW with sampling                                                       |
+| Restore: Atomic rollback with SHA-256 validation                                 |
+| Deployment: PowerShell + WDAC policy                                             |
++----------------------------------------------------------------------------------+
+
++----------------------------------------------------------------------------------+
+|                        🧠 Enterprise Readiness & Strategy                         |
+|----------------------------------------------------------------------------------|
+| Scale: 10,000+ endpoints                                                         |
+| Self-Healing: Detect tampering, restore app, restart process                    |
+| Integration: Defender ATP, Azure DevOps, Intune                                  |
+| Red Teaming: Atomic Red Team + performance benchmarks                            |
+| Monitoring: Registry keys + MiniDump scrubbing                                   |
+| Security: WHQL, HLK automation, hardened runtime                                 |
++----------------------------------------------------------------------------------+
 
 ## ✨ Features aus deiner lokalen Version
 - MiniDump-Scrubbing mit Heuristik
