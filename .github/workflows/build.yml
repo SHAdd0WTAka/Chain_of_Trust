@@ -17,7 +17,7 @@ jobs:
         run: vcpkg install
 
       - name: Configure with CMake
-        run: cmake -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/.github/workflows/build.yml
+        run: cmake -DCMAKE_TOOLCHAIN_FILE=C:/.github/workflows/build.yml
 
       - name: Build
         run: cmake --build out/build/ci-windows --config Release
