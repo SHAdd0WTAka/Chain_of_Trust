@@ -3,17 +3,12 @@
   "configurePresets": [
     {
       "name": "ci-windows",
-      "displayName": "CI Build for Windows",
-      "description": "Build preset for GitHub Actions on Windows",
       "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "architecture": "x64",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        "CMAKE_TOOLCHAIN_FILE": "$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
       }
     }
   ]
 }
-
-
-

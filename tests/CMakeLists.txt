@@ -1,0 +1,5 @@
+find_package(GTest CONFIG REQUIRED)
+add_executable(run_tests agent_test.cpp)
+target_link_libraries(run_tests PRIVATE GTest::gtest_main GTest::gtest common)
+include(GoogleTest)
+gtest_discover_tests(run_tests)
