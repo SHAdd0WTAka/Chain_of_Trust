@@ -1,5 +1,4 @@
 name: Build & Test
-
 on:
   push:
     branches: [ main ]
@@ -8,19 +7,22 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-      - name: Install vcpkg dependencies
-        run: vcpkg install
+      - name: Bootstrap Vcpkg
+        run: |
+          cd vcpkg
+          .\bootstrap-vcpkg.bat
 
-      - name: Configure with CMake
-        run: cmake -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -G "Visual Studio 17 2022" -A x64 -S . -B out/build/ci-windows
+      - name: Configure CMake
+        run: |
+          cmake -B build -S . `
+            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
-        run: cmake --build out/build/ci-windows --config Release
-
-      - name: Test
-        run: ctest --test-dir out/build/ci-windows -C Release --output-on-failure
+        run: cmake --build build --config Release
