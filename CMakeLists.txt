@@ -4,7 +4,10 @@ project(Chain_of_Trust VERSION 1.0.0 LANGUAGES C CXX ASM)
 option(BUILD_KERNEL   "Build kernel driver" ON)
 option(BUILD_TESTS    "Build tests" ON)
 
-find_package(Detours CONFIG REQUIRED)
+# Detours often doesn't provide a CMake config in some vcpkg versions
+find_path(DETOURS_INCLUDE_DIRS "detours/detours.h")
+find_library(DETOURS_LIBRARY detours REQUIRED)
+
 find_package(GTest CONFIG REQUIRED)
 
 add_subdirectory(src/edr_agent)
