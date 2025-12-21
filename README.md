@@ -88,12 +88,12 @@ Das ist kein Luftschloss. Es ist ein Blueprint für ein ernstzunehmendes Sicherh
 ## 📚 Dokumentation
 Siehe Wiki & Diskussionen für Architekturdetails und Roadmap.
 
-# Vertrauensnetz 🔐  
+# Chain_of_Trust 🔐  
 Chain-of-Trust für Windows-Treiber mit TPM & WDAC
 
-![Build](https://github.com/SHAdd0WTAka/Vertrauensnetz/actions/workflows/build.yml/badge.svg)
-![License](https://img.shields.io/github/license/SHAdd0WTAka/Vertrauensnetz)
-![Release](https://img.shields.io/github/v/release/SHAdd0WTAka/Vertrauensnetz)
+![Build](https://github.com/SHAdd0WTAka/Chain_of_Trust/actions/workflows/build.yml/badge.svg)
+![License](https://img.shields.io/github/license/SHAdd0WTAka/Chain_of_Trust)
+![Release](https://img.shields.io/github/v/release/SHAdd0WTAka/Chain_of_Trust)
 
 ## Features
 
@@ -390,8 +390,8 @@ EUPL-1.2 – free for commercial use, patent clause included.
 3. Commit & Push – GitHub Actions baut sofort.  
 
 WHQL- / EV-Zertifikat eintragen → fertig für Produktion.
-git clone https://github.com/SHAdd0WTAka/Vertrauensnetz.git
-cd Vertrauensnetz
+git clone https://github.com/SHAdd0WTAka/Chain_of_Trust.git
+cd Chain_of_Trust
 cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 cmake --build build --config Release
 ctest --test-dir build -C Release
