@@ -55,4 +55,4 @@ WHQL- / EV-Zertifikat eintragen → fertig für Produktion.
 ---
 
 ### License
-EUPL-1.2 – free for commercial use, patent clause included.
+MIT – free for commercial use, patent clause included.
