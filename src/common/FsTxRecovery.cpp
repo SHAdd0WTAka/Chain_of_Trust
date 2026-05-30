@@ -62,7 +62,7 @@ bool FsTxRecovery::TriggerRecoveryReboot(const std::wstring& checkpointLabel) {
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
         return false;
 
-    LookupPrivilegeValueW(NULL, SE_SHUTDOWN_NAME, &tkp.Privileges[0].Luid);
+    LookupPrivilegeValueW(NULL, L"SeShutdownPrivilege", &tkp.Privileges[0].Luid);
     tkp.PrivilegeCount = 1;
     tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
     AdjustTokenPrivileges(hToken, FALSE, &tkp, 0, NULL, 0);
@@ -78,19 +78,19 @@ bool FsTxRecovery::SaveStateToFile(const std::wstring& path, const SystemState& 
 
     size_t tpmlen = state.TpmSealedBlob.size();
     file.write(reinterpret_cast<const char*>(&tpmlen), sizeof(tpmlen));
-    file.write(reinterpret_cast<const char*>(state.TpmSealedBlob.data()), tpmlen);
+    if (tpmlen > 0) file.write(reinterpret_cast<const char*>(state.TpmSealedBlob.data()), tpmlen);
 
     size_t bcdLen = state.BcdEntry.size() * sizeof(wchar_t);
     file.write(reinterpret_cast<const char*>(&bcdLen), sizeof(bcdLen));
-    file.write(reinterpret_cast<const char*>(state.BcdEntry.data()), bcdLen);
+    if (bcdLen > 0) file.write(reinterpret_cast<const char*>(state.BcdEntry.c_str()), bcdLen);
 
     size_t regLen = state.RegistryHivePath.size() * sizeof(wchar_t);
     file.write(reinterpret_cast<const char*>(&regLen), sizeof(regLen));
-    file.write(reinterpret_cast<const char*>(state.RegistryHivePath.data()), regLen);
+    if (regLen > 0) file.write(reinterpret_cast<const char*>(state.RegistryHivePath.c_str()), regLen);
 
     size_t cfgLen = state.AgentConfigPath.size() * sizeof(wchar_t);
     file.write(reinterpret_cast<const char*>(&cfgLen), sizeof(cfgLen));
-    file.write(reinterpret_cast<const char*>(state.AgentConfigPath.data()), cfgLen);
+    if (cfgLen > 0) file.write(reinterpret_cast<const char*>(state.AgentConfigPath.c_str()), cfgLen);
 
     return true;
 }
@@ -102,22 +102,22 @@ bool FsTxRecovery::LoadStateFromFile(const std::wstring& path, SystemState& stat
     size_t tpmlen = 0;
     file.read(reinterpret_cast<char*>(&tpmlen), sizeof(tpmlen));
     state.TpmSealedBlob.resize(tpmlen);
-    file.read(reinterpret_cast<char*>(state.TpmSealedBlob.data()), tpmlen);
+    if (tpmlen > 0) file.read(reinterpret_cast<char*>(state.TpmSealedBlob.data()), tpmlen);
 
     size_t bcdLen = 0;
     file.read(reinterpret_cast<char*>(&bcdLen), sizeof(bcdLen));
     state.BcdEntry.resize(bcdLen / sizeof(wchar_t));
-    file.read(reinterpret_cast<char*>(state.BcdEntry.data()), bcdLen);
+    if (bcdLen > 0) file.read(reinterpret_cast<char*>(state.BcdEntry.data()), bcdLen);
 
     size_t regLen = 0;
     file.read(reinterpret_cast<char*>(&regLen), sizeof(regLen));
     state.RegistryHivePath.resize(regLen / sizeof(wchar_t));
-    file.read(reinterpret_cast<char*>(state.RegistryHivePath.data()), regLen);
+    if (regLen > 0) file.read(reinterpret_cast<char*>(state.RegistryHivePath.data()), regLen);
 
     size_t cfgLen = 0;
     file.read(reinterpret_cast<char*>(&cfgLen), sizeof(cfgLen));
     state.AgentConfigPath.resize(cfgLen / sizeof(wchar_t));
-    file.read(reinterpret_cast<char*>(state.AgentConfigPath.data()), cfgLen);
+    if (cfgLen > 0) file.read(reinterpret_cast<char*>(state.AgentConfigPath.data()), cfgLen);
 
     return true;
 }

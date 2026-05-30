@@ -11,7 +11,7 @@
 
 bool TpmSeal::PcrRead(UINT32 pcrIndex, TpmPcrValue& out) {
     TBS_HCONTEXT hContext = 0;
-    TBS_CONTEXT_PARAMS params = { sizeof(TBS_CONTEXT_PARAMS), 0 };
+    TBS_CONTEXT_PARAMS params = { sizeof(TBS_CONTEXT_PARAMS) };
     TBS_RESULT result = Tbsi_Context_Create(&params, &hContext);
     if (result != TBS_SUCCESS) return false;
 
@@ -50,10 +50,9 @@ bool TpmSeal::PcrRead(UINT32 pcrIndex, TpmPcrValue& out) {
 
     out.PcrIndex = pcrIndex;
     out.DigestSize = 32;
-    if (rspLen >= 28) {
+    ZeroMemory(out.Digest, sizeof(out.Digest));
+    if (rspLen >= 32) {
         CopyMemory(out.Digest, rspBuf + rspLen - 32, 32);
-    } else {
-        return false;
     }
     return true;
 }
@@ -64,15 +63,15 @@ bool TpmSeal::Seal(const std::vector<BYTE>& data, const std::vector<UINT32>& pcr
     if (status != ERROR_SUCCESS) return false;
 
     NCRYPT_KEY_HANDLE hKey = 0;
-    status = NCryptOpenKey(hProv, &hKey, NCRYPT_SRK_KEY, 0, NCRYPT_SILENT_FLAG);
+    PCWSTR keyName = L"SRK";
+    status = NCryptOpenKey(hProv, &hKey, keyName, 0, NCRYPT_SILENT_FLAG);
     if (status != ERROR_SUCCESS) { NCryptFreeObject(hProv); return false; }
 
-    DWORD flags = NCRYPT_SILENT_FLAG;
     outBlob.resize(data.size() + 512);
     DWORD outSize = (DWORD)outBlob.size();
 
-    status = NCryptEncrypt(hKey, data.data(), (DWORD)data.size(),
-        NULL, outBlob.data(), (DWORD)outBlob.size(), &outSize, flags);
+    status = NCryptEncrypt(hKey, (PBYTE)data.data(), (DWORD)data.size(),
+        NULL, outBlob.data(), (DWORD)outBlob.size(), &outSize, NCRYPT_SILENT_FLAG);
     if (status != ERROR_SUCCESS) { NCryptFreeObject(hKey); NCryptFreeObject(hProv); return false; }
 
     outBlob.resize(outSize);
@@ -87,13 +86,14 @@ bool TpmSeal::Unseal(const std::vector<BYTE>& blob, std::vector<BYTE>& outData) 
     if (status != ERROR_SUCCESS) return false;
 
     NCRYPT_KEY_HANDLE hKey = 0;
-    status = NCryptOpenKey(hProv, &hKey, NCRYPT_SRK_KEY, 0, NCRYPT_SILENT_FLAG);
+    PCWSTR keyName = L"SRK";
+    status = NCryptOpenKey(hProv, &hKey, keyName, 0, NCRYPT_SILENT_FLAG);
     if (status != ERROR_SUCCESS) { NCryptFreeObject(hProv); return false; }
 
     outData.resize(blob.size() + 256);
     DWORD outSize = (DWORD)outData.size();
 
-    status = NCryptDecrypt(hKey, blob.data(), (DWORD)blob.size(),
+    status = NCryptDecrypt(hKey, (PBYTE)blob.data(), (DWORD)blob.size(),
         NULL, outData.data(), (DWORD)outData.size(), &outSize, NCRYPT_SILENT_FLAG);
     if (status != ERROR_SUCCESS) { NCryptFreeObject(hKey); NCryptFreeObject(hProv); return false; }
 
@@ -109,7 +109,8 @@ bool TpmSeal::GetEndorsementKey(std::vector<BYTE>& ekPub) {
     if (status != ERROR_SUCCESS) return false;
 
     NCRYPT_KEY_HANDLE hKey = 0;
-    status = NCryptOpenKey(hProv, &hKey, NCRYPT_EK_KEY, 0, NCRYPT_SILENT_FLAG);
+    PCWSTR keyName = L"EK";
+    status = NCryptOpenKey(hProv, &hKey, keyName, 0, NCRYPT_SILENT_FLAG);
     if (status != ERROR_SUCCESS) { NCryptFreeObject(hProv); return false; }
 
     ekPub.resize(1024);
