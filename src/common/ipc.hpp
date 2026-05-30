@@ -40,3 +40,9 @@ struct AKIR_TPM_REQUEST {
     BYTE   Output[1024];
     DWORD  OutputSize;
 };
+
+bool OpenAKIRDevice(HANDLE& hDevice);
+void CloseAKIRDevice(HANDLE hDevice);
+bool SendIoctlResetTimer(HANDLE hDevice);
+bool SendIoctlGetStatus(HANDLE hDevice, AKIR_TIMER_STATUS& status);
+bool SendIoctlRegisterProtect(HANDLE hDevice, DWORD pid);
