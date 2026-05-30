@@ -30,5 +30,5 @@ jobs:
         run: cmake --build build --config Release
 
       - name: Run Unit Tests
-        run: ./build/Release/ChainOfTrust_Tests.exe
+        run: .\build\tests\Release\ChainOfTrust_Tests.exe
         continue-on-error: true
