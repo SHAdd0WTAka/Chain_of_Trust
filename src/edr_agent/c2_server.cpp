@@ -1,6 +1,4 @@
 #include "c2_server.hpp"
-#include <winsock2.h>
-#include <ws2tcpip.h>
 #include <sstream>
 #include <algorithm>
 #include <cctype>

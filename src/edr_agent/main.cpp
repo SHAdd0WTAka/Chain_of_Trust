@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <tlhelp32.h>
 #include <shlobj.h>
+#include <cstdio>
 #include <iostream>
 #include <thread>
 #include <atomic>
