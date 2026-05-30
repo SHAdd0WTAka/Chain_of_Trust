@@ -78,7 +78,7 @@ bool IntegrityGuard::SnapshotProcess(DWORD pid, ProcessSnapshot& snap) {
     return GetProcessTextHash(pid, snap.TextSectionHash, snap.TextSectionSize);
 }
 
-bool IntegrityGuard::VerifyProcess(const ProcessSnapshot& snap) {
+bool IntegrityGuard::VerifyProcess(const ProcessSnapshot& snap) noexcept {
     BYTE currentHash[32] = { 0 };
     SIZE_T currentSize = 0;
     if (!GetProcessTextHash(snap.Pid, currentHash, currentSize)) return false;

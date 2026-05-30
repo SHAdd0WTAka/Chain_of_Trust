@@ -12,6 +12,7 @@
 #include <wbemidl.h>
 #include <string>
 #include <vector>
+#include <mutex>
 
 struct BitLockerDrive {
     std::wstring DriveLetter;
@@ -29,24 +30,25 @@ struct BitLockerKey {
 
 class BitLockerManager {
 public:
-    static bool Initialize();
+    [[nodiscard]] static bool Initialize();
     static void Shutdown();
-    static bool IsAvailable();
+    [[nodiscard]] static bool IsAvailable() noexcept;
 
-    static std::vector<BitLockerDrive> EnumerateDrives();
-    static std::vector<BitLockerKey> GetKeyProtectors(const std::wstring& driveLetter);
-    static bool GetKeyProtectorData(const std::wstring& driveLetter, const std::wstring& protectorId, BitLockerKey& key);
-    static bool SetNumericalPassword(const std::wstring& driveLetter, const std::wstring& password);
-    static std::wstring GetLastError();
+    [[nodiscard]] static std::vector<BitLockerDrive> EnumerateDrives();
+    [[nodiscard]] static std::vector<BitLockerKey> GetKeyProtectors(const std::wstring& driveLetter);
+    [[nodiscard]] static bool GetKeyProtectorData(const std::wstring& driveLetter, const std::wstring& protectorId, BitLockerKey& key);
+    [[nodiscard]] static bool SetNumericalPassword(const std::wstring& driveLetter, const std::wstring& password);
+    [[nodiscard]] static std::wstring GetLastError() noexcept;
 
 private:
     static IWbemServices* m_pServices;
     static bool m_initialized;
     static std::wstring m_lastError;
 
-    static bool ConnectWmi();
-    static IEnumWbemClassObject* Query(const std::wstring& query);
-    static IWbemClassObject* GetObject(const std::wstring& path);
-    static IWbemClassObject* ExecMethod(const std::wstring& objPath, const std::wstring& method,
+    [[nodiscard]] static bool ConnectWmi();
+    [[nodiscard]] static IEnumWbemClassObject* Query(const std::wstring& query);
+    [[nodiscard]] static IWbemClassObject* GetObject(const std::wstring& path);
+    [[nodiscard]] static IWbemClassObject* ExecMethod(const std::wstring& objPath, const std::wstring& method,
                                         IWbemClassObject* pIn);
+    static std::mutex m_mutex;
 };

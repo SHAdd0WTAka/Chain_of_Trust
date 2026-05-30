@@ -16,7 +16,7 @@ struct ProcessSnapshot {
 
 class IntegrityGuard {
 public:
-    static bool SnapshotProcess(DWORD pid, ProcessSnapshot& snap);
-    static bool VerifyProcess(const ProcessSnapshot& snap);
-    static bool GetProcessTextHash(DWORD pid, BYTE hash[32], SIZE_T& size);
+    [[nodiscard]] static bool SnapshotProcess(DWORD pid, ProcessSnapshot& snap);
+    [[nodiscard]] static bool VerifyProcess(const ProcessSnapshot& snap) noexcept;
+    [[nodiscard]] static bool GetProcessTextHash(DWORD pid, BYTE hash[32], SIZE_T& size);
 };

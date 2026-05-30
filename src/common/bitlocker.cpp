@@ -2,12 +2,14 @@
 #include <comdef.h>
 #include <sstream>
 #include <iomanip>
+#include <mutex>
 
 #pragma comment(lib, "wbemuuid.lib")
 
 IWbemServices* BitLockerManager::m_pServices = nullptr;
 bool BitLockerManager::m_initialized = false;
 std::wstring BitLockerManager::m_lastError;
+std::mutex BitLockerManager::m_mutex;
 
 static std::wstring VariantToString(const VARIANT& vt) {
     if (vt.vt == VT_BSTR) return vt.bstrVal ? vt.bstrVal : L"";
@@ -27,6 +29,7 @@ bool BitLockerManager::Initialize() {
 
     HRESULT hr = CoInitializeEx(0, COINIT_APARTMENTTHREADED);
     if (FAILED(hr) && hr != RPC_E_CHANGED_MODE) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_lastError = L"CoInitializeEx failed: " + GetWmiError(hr);
         return false;
     }
@@ -35,6 +38,7 @@ bool BitLockerManager::Initialize() {
         RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE,
         NULL, EOAC_NONE, NULL);
     if (FAILED(hr) && hr != RPC_E_TOO_LATE) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_lastError = L"CoInitializeSecurity failed: " + GetWmiError(hr);
         return false;
     }
@@ -50,6 +54,7 @@ bool BitLockerManager::ConnectWmi() {
     HRESULT hr = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER,
         IID_IWbemLocator, reinterpret_cast<LPVOID*>(&pLoc));
     if (FAILED(hr)) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_lastError = L"CoCreateInstance IWbemLocator failed: " + GetWmiError(hr);
         return false;
     }
@@ -59,6 +64,7 @@ bool BitLockerManager::ConnectWmi() {
     pLoc->Release();
 
     if (FAILED(hr)) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_lastError = L"ConnectServer to BitLocker namespace failed: " + GetWmiError(hr);
         m_pServices = nullptr;
         return false;
@@ -68,6 +74,7 @@ bool BitLockerManager::ConnectWmi() {
         NULL, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE,
         NULL, EOAC_NONE);
     if (FAILED(hr)) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_lastError = L"CoSetProxyBlanket failed: " + GetWmiError(hr);
         m_pServices->Release();
         m_pServices = nullptr;
@@ -86,7 +93,7 @@ void BitLockerManager::Shutdown() {
     m_initialized = false;
 }
 
-bool BitLockerManager::IsAvailable() {
+bool BitLockerManager::IsAvailable() noexcept {
     return m_initialized && m_pServices != nullptr;
 }
 
@@ -95,6 +102,7 @@ IEnumWbemClassObject* BitLockerManager::Query(const std::wstring& query) {
     HRESULT hr = m_pServices->ExecQuery(L"WQL", bstr_t(query.c_str()),
         WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnum);
     if (FAILED(hr)) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_lastError = L"ExecQuery failed: " + GetWmiError(hr);
         return nullptr;
     }
@@ -105,6 +113,7 @@ IWbemClassObject* BitLockerManager::GetObject(const std::wstring& path) {
     IWbemClassObject* pObj = nullptr;
     HRESULT hr = m_pServices->GetObject(bstr_t(path.c_str()), 0, NULL, &pObj, NULL);
     if (FAILED(hr)) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_lastError = L"GetObject failed: " + GetWmiError(hr);
         return nullptr;
     }
@@ -117,6 +126,7 @@ IWbemClassObject* BitLockerManager::ExecMethod(const std::wstring& objPath, cons
     HRESULT hr = m_pServices->ExecMethod(bstr_t(objPath.c_str()),
         bstr_t(method.c_str()), 0, NULL, pIn, &pOut, NULL);
     if (FAILED(hr)) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_lastError = L"ExecMethod " + method + L" failed: " + GetWmiError(hr);
         return nullptr;
     }
@@ -209,6 +219,7 @@ std::vector<BitLockerKey> BitLockerManager::GetKeyProtectors(const std::wstring&
         }
     }
     if (!target) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_lastError = L"Drive not found: " + driveLetter;
         return keys;
     }
@@ -231,6 +242,7 @@ bool BitLockerManager::GetKeyProtectorData(const std::wstring& driveLetter,
     HRESULT hr = m_pServices->GetObject(
         bstr_t((objPath + L"\\GetKeyProtectorKey").c_str()), 0, NULL, &pInClass, NULL);
     if (FAILED(hr) || !pInClass) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_lastError = L"GetKeyProtectorKey method not found";
         return false;
     }
@@ -292,6 +304,7 @@ bool BitLockerManager::SetNumericalPassword(const std::wstring& driveLetter, con
     HRESULT hr = m_pServices->GetObject(
         bstr_t((objPath + L"\\ProtectKeyWithNumericalPassword").c_str()), 0, NULL, &pInClass, NULL);
     if (FAILED(hr) || !pInClass) {
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_lastError = L"ProtectKeyWithNumericalPassword method not found";
         return false;
     }
@@ -313,6 +326,7 @@ bool BitLockerManager::SetNumericalPassword(const std::wstring& driveLetter, con
     return true;
 }
 
-std::wstring BitLockerManager::GetLastError() {
+std::wstring BitLockerManager::GetLastError() noexcept {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_lastError;
 }
