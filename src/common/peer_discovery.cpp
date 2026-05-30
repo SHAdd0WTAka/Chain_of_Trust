@@ -48,7 +48,7 @@ bool PeerDiscovery::SendUdpPacket(const std::wstring& address, USHORT port, cons
         setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char*)&broadcast, sizeof(broadcast));
         dest.sin_addr.s_addr = htonl(INADDR_BROADCAST);
     } else {
-        std::string addr Narrow(address.begin(), address.end());
+        std::string addr(address.begin(), address.end());
         inet_pton(AF_INET, addr.c_str(), &dest.sin_addr);
     }
 

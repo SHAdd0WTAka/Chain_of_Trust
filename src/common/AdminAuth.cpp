@@ -1,4 +1,5 @@
 #include "AdminAuth.hpp"
+#include "ipc.hpp"
 #include <ctime>
 #include <iostream>
 #include <sstream>
@@ -83,9 +84,7 @@ void AdminAuth::ResetKernelTimer() {
     }
 
     DWORD bytesReturned = 0;
-    ULONG ioctlCode = CTL_CODE(FILE_DEVICE_UNKNOWN, 0x801, METHOD_BUFFERED, FILE_WRITE_ACCESS);
-
-    DeviceIoControl(hDevice, ioctlCode, NULL, 0, NULL, 0, &bytesReturned, NULL);
+    DeviceIoControl(hDevice, IOCTL_AKIR_RESET_TIMER, NULL, 0, NULL, 0, &bytesReturned, NULL);
     CloseHandle(hDevice);
 
     std::cout << "[AKIR] Kernel timer reset via IOCTL" << std::endl;

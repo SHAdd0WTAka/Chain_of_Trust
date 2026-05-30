@@ -19,7 +19,7 @@ static std::wstring VariantToString(VARIANT& vt) {
 
 static std::wstring GetWmiError(HRESULT hr) {
     _com_error err(hr);
-    return err.ErrorMessage();
+    return err.WideErrorMessage();
 }
 
 bool BitLockerManager::Initialize() {

@@ -3,6 +3,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
+#include <winioctl.h>
 #include <string>
 
 #define AKIR_DEVICE_NAME L"\\Device\\AKIR_EDR"

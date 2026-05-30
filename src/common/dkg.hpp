@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include "shamir.hpp"
+#include "peer_discovery.hpp"
 
 struct DkgConfig {
     BYTE Threshold;     // M - minimum shards needed
