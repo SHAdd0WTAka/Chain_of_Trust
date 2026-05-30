@@ -9,7 +9,7 @@ IWbemServices* BitLockerManager::m_pServices = nullptr;
 bool BitLockerManager::m_initialized = false;
 std::wstring BitLockerManager::m_lastError;
 
-static std::wstring VariantToString(VARIANT& vt) {
+static std::wstring VariantToString(const VARIANT& vt) {
     if (vt.vt == VT_BSTR) return vt.bstrVal ? vt.bstrVal : L"";
     if (vt.vt == VT_I4) return std::to_wstring(vt.lVal);
     if (vt.vt == VT_UI4) return std::to_wstring(vt.ulVal);
@@ -48,7 +48,7 @@ bool BitLockerManager::Initialize() {
 bool BitLockerManager::ConnectWmi() {
     IWbemLocator* pLoc = nullptr;
     HRESULT hr = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER,
-        IID_IWbemLocator, (LPVOID*)&pLoc);
+        IID_IWbemLocator, reinterpret_cast<LPVOID*>(&pLoc));
     if (FAILED(hr)) {
         m_lastError = L"CoCreateInstance IWbemLocator failed: " + GetWmiError(hr);
         return false;

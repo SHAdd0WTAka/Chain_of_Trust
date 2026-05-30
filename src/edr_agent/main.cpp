@@ -1,7 +1,11 @@
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <windows.h>
 #include <tlhelp32.h>
 #include <shlobj.h>
 #include <cstdio>
+#include <algorithm>
 #include <iostream>
 #include <thread>
 #include <atomic>
@@ -148,7 +152,7 @@ void TpmStatusCheck() {
         TpmPcrValue val;
         if (TpmSeal::PcrRead(pcr, val)) {
             std::cout << "[AKIR] PCR " << pcr << ": ";
-            for (UINT32 i = 0; i < min(4, val.DigestSize); i++) printf("%02x", val.Digest[i]);
+            for (UINT32 i = 0; i < std::min<UINT32>(4, val.DigestSize); i++) printf("%02x", val.Digest[i]);
             std::cout << "..." << std::endl;
         }
     }
