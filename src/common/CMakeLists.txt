@@ -4,7 +4,11 @@ add_library(common
     AdminAuth.cpp
     IntegrityGuard.cpp
     FsTxRecovery.cpp
+    shamir.cpp
+    bitlocker.cpp
+    peer_discovery.cpp
+    dkg.cpp
 )
 
 target_include_directories(common PUBLIC .)
-target_link_libraries(common PRIVATE bcrypt ntdll)
+target_link_libraries(common PRIVATE bcrypt ntdll ws2_32 wbemuuid)

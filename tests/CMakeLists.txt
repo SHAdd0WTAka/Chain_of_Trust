@@ -5,6 +5,10 @@ add_executable(ChainOfTrust_Tests
     ../src/common/FsTxRecovery.cpp
     ../src/common/crypto.cpp
     ../src/common/ipc.cpp
+    ../src/common/shamir.cpp
+    ../src/common/bitlocker.cpp
+    ../src/common/peer_discovery.cpp
+    ../src/common/dkg.cpp
 )
 
 target_include_directories(ChainOfTrust_Tests PRIVATE
@@ -19,6 +23,8 @@ target_link_libraries(ChainOfTrust_Tests PRIVATE
     bcrypt
     ntdll
     psapi
+    ws2_32
+    wbemuuid
 )
 
 include(GoogleTest)
