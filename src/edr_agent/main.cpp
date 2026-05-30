@@ -180,7 +180,6 @@ int wmain(int argc, wchar_t* argv[]) {
     if (OpenAKIRDevice(hDevice)) {
         DWORD ourPid = GetCurrentProcessId();
         SendIoctlRegisterProtect(hDevice, ourPid);
-        StartIntegrityMonitoring();
         CloseAKIRDevice(hDevice);
     }
 
