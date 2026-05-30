@@ -107,17 +107,17 @@ bool FsTxRecovery::LoadStateFromFile(const std::wstring& path, SystemState& stat
     size_t bcdLen = 0;
     file.read(reinterpret_cast<char*>(&bcdLen), sizeof(bcdLen));
     state.BcdEntry.resize(bcdLen / sizeof(wchar_t));
-    if (bcdLen > 0) file.read(reinterpret_cast<char*>(state.BcdEntry.data()), bcdLen);
+    if (bcdLen > 0) file.read(reinterpret_cast<char*>(&state.BcdEntry[0]), bcdLen);
 
     size_t regLen = 0;
     file.read(reinterpret_cast<char*>(&regLen), sizeof(regLen));
     state.RegistryHivePath.resize(regLen / sizeof(wchar_t));
-    if (regLen > 0) file.read(reinterpret_cast<char*>(state.RegistryHivePath.data()), regLen);
+    if (regLen > 0) file.read(reinterpret_cast<char*>(&state.RegistryHivePath[0]), regLen);
 
     size_t cfgLen = 0;
     file.read(reinterpret_cast<char*>(&cfgLen), sizeof(cfgLen));
     state.AgentConfigPath.resize(cfgLen / sizeof(wchar_t));
-    if (cfgLen > 0) file.read(reinterpret_cast<char*>(state.AgentConfigPath.data()), cfgLen);
+    if (cfgLen > 0) file.read(reinterpret_cast<char*>(&state.AgentConfigPath[0]), cfgLen);
 
     return true;
 }
